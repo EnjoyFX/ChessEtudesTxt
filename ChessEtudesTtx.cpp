@@ -13,7 +13,7 @@ int const WhiteCell = 0xF0, BlackCell = 0x07, ActiveCell = 0x1F;
 int X, Y, counter, vertical, horizontal;
 int current[15];
 
-void gotoXY(short x, short y)
+void setXY(short x, short y) // set cursor position at x,y (x - horisontal, y - vertical)
 {
 	COORD coord = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
@@ -38,11 +38,11 @@ void  Header(int X, int Y, char* TextLogo, int ColorEntered = 111)
 	int StoredColor = csbi.wAttributes;
 
 	SetConsoleTextAttribute(hStdout, ColorEntered);
-	gotoXY(X, Y);
+	setXY(X, Y);
 	cout << LU << MyLine << RU;
-	gotoXY(X, Y + 1);
+	setXY(X, Y + 1);
 	cout << BS << " " << TextLogo << " " << BS;
-	gotoXY(X, Y + 2);
+	setXY(X, Y + 2);
 	cout << LD << MyLine << RD;
 	SetConsoleTextAttribute(hStdout, StoredColor);
 }
@@ -74,7 +74,7 @@ void WriteCentered(char* Text, int Row, int MinCol, int MaxCol = 80, int ColorEn
 {
 	int LenText = strlen(Text);
 	if (ColorEntered == 256) {
-		gotoXY(MinCol + (MaxCol - MinCol - LenText) / 2, Row);
+		setXY(MinCol + (MaxCol - MinCol - LenText) / 2, Row);
 		cout << Text;
 	}
 	else {
@@ -83,7 +83,7 @@ void WriteCentered(char* Text, int Row, int MinCol, int MaxCol = 80, int ColorEn
 		GetConsoleScreenBufferInfo(hStdout, &csbi);
 		int StoredColor = csbi.wAttributes;
 		SetConsoleTextAttribute(hStdout, ColorEntered);
-		gotoXY(MinCol + (MaxCol - MinCol - LenText) / 2, Row);
+		setXY(MinCol + (MaxCol - MinCol - LenText) / 2, Row);
 		cout << Text;
 		SetConsoleTextAttribute(hStdout, StoredColor);
 	}
@@ -95,7 +95,7 @@ void Chessbox(int X, int Y, int color = WhiteCell, bool EmptyCell = true)
 	int count = 0;
 	for (int j = 0; j < Size; j++) {
 		for (int i = 0; i < Size + 2; i++) {
-			gotoXY(X + i, Y + j);
+			setXY(X + i, Y + j);
 			if (EmptyCell != true) {
 				cout << char(current[count++]);
 			}
@@ -109,7 +109,7 @@ void Chessbox(int X, int Y, int color = WhiteCell, bool EmptyCell = true)
 
 void MoveDot(int hor, int vert, bool WriteMoves)
 {
-	gotoXY(3 + (hor - 1) * 5, 2 + (vert - 1) * 3);
+	setXY(3 + (hor - 1) * 5, 2 + (vert - 1) * 3);
 	if (WriteMoves == true) {
 		cout << 'x';
 	}
@@ -119,7 +119,7 @@ void MoveDot(int hor, int vert, bool WriteMoves)
 	ChangeColor(3 + (hor - 1) * 5, 2 + (vert - 1) * 3, 1, ((hor + vert) % 2 != 0) ? WhiteCell : BlackCell);
 }
 
-void RookMoves(bool WriteMoves)
+void RookMoves(bool WriteMoves) // moves writer for Rook
 {
 	if (vertical < 8) {
 		for (int i = vertical + 1; i <= 8; i++) {
@@ -142,7 +142,7 @@ void RookMoves(bool WriteMoves)
 		}
 	}
 }
-void BishopMoves(bool WriteMoves)
+void BishopMoves(bool WriteMoves) // moves writer for Bishop
 {
 	int h1 = horizontal, v1 = vertical;
 	int h2 = horizontal, v2 = vertical;
@@ -177,41 +177,41 @@ void BishopMoves(bool WriteMoves)
 	}
 }
 
-void KnightMoves(bool WriteMoves)
+void KnightMoves(bool WriteMoves) // moves writer for Knight
 {
 	if (vertical < 7 && horizontal < 8) {
-			MoveDot(horizontal + 1, vertical + 2, WriteMoves);
+		MoveDot(horizontal + 1, vertical + 2, WriteMoves);
 	}
 
-	if (vertical<7 && horizontal > 1) {
-			MoveDot(horizontal - 1, vertical + 2, WriteMoves);
+	if (vertical < 7 && horizontal > 1) {
+		MoveDot(horizontal - 1, vertical + 2, WriteMoves);
 	}
 
-	if (horizontal> 1 && vertical>2) {
-			MoveDot(horizontal - 1, vertical - 2, WriteMoves);
+	if (horizontal > 1 && vertical>2) {
+		MoveDot(horizontal - 1, vertical - 2, WriteMoves);
 	}
 
-	if (vertical>2 && horizontal <8) {
-			MoveDot(horizontal + 1, vertical - 2, WriteMoves);
+	if (vertical > 2 && horizontal < 8) {
+		MoveDot(horizontal + 1, vertical - 2, WriteMoves);
 	}
-	
-	if (horizontal >2 && vertical>1) {
-			MoveDot(horizontal - 2, vertical - 1, WriteMoves);
+
+	if (horizontal > 2 && vertical > 1) {
+		MoveDot(horizontal - 2, vertical - 1, WriteMoves);
 	}
-	
-	if (horizontal <7 && vertical<=7) {
-			MoveDot(horizontal + 2, vertical + 1, WriteMoves);
+
+	if (horizontal < 7 && vertical <= 7) {
+		MoveDot(horizontal + 2, vertical + 1, WriteMoves);
 	}
-	
-	if (horizontal >2 && vertical <= 7) {
+
+	if (horizontal > 2 && vertical <= 7) {
 		MoveDot(horizontal - 2, vertical + 1, WriteMoves);
 	}
 
-	if (horizontal <7 && vertical > 1) {
-			MoveDot(horizontal + 2, vertical - 1, WriteMoves);
+	if (horizontal < 7 && vertical > 1) {
+		MoveDot(horizontal + 2, vertical - 1, WriteMoves);
 	}
 }
-void QueenMoves(bool WriteMoves)
+void QueenMoves(bool WriteMoves) //moves writer for Queen
 {
 	int h1 = horizontal, v1 = vertical;
 	int h2 = horizontal, v2 = vertical;
@@ -249,7 +249,7 @@ void QueenMoves(bool WriteMoves)
 		}
 	}
 }
-void Selected(int figure, bool WriteMoves = true)
+void Selected(int figure, bool WriteMoves = true) // selector of moves for figure
 {
 	enum Figs { Rook = 1, Bishop = 2, Knight = 3, Queen = 4 };
 	switch (figure) {
@@ -268,7 +268,7 @@ void Selected(int figure, bool WriteMoves = true)
 	}
 
 }
-void MyASCII()
+void MyASCII() // test table
 {
 	for (int i = 0; i < 255; i++) {
 		cout << setw(6) << i << "=" << char(i);
@@ -276,11 +276,11 @@ void MyASCII()
 
 }
 
-void ChessBoard(int offX, int offY)
+void ChessBoard(int offX, int offY) // chessboard in txt
 {
 	int const size = 5;
 	for (int i = 1; i <= 8; i++) {
-		gotoXY(0, i*(size - 2) - 1);
+		setXY(0, i*(size - 2) - 1);
 		cout << i;
 	}
 	int counter = 1;
@@ -294,12 +294,12 @@ void ChessBoard(int offX, int offY)
 		counter++;
 	}
 	for (int i = 1; i <= 8; i++) {
-		gotoXY(i*size - 2, 0);
+		setXY(i*size - 2, 0);
 		cout << char(96 + i);
 	}
-	gotoXY(42, 0);
+	setXY(42, 0);
 }
-int KeyControl()
+int KeyControl()  // keycode reader
 {
 	while (true) {
 		int key = _getch();
@@ -307,7 +307,7 @@ int KeyControl()
 	}
 }
 
-void Move(int dx, int dy)
+void Move(int dx, int dy) // move of one chessbox
 {
 	Chessbox(X, Y, (counter % 2 == 0) ? WhiteCell : BlackCell);
 	X += dx;
@@ -316,7 +316,7 @@ void Move(int dx, int dy)
 }
 
 
-void Cursor(bool visible)
+void Cursor(bool visible) // function for on/off the cursor
 {
 	HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO structCursorInfo;
@@ -325,17 +325,18 @@ void Cursor(bool visible)
 	SetConsoleCursorInfo(hStdout, &structCursorInfo);
 }
 
-void OneBar(int x, int y, int len, int color, bool PrintFrames = true)
+void OneBar(int x, int y, int len, int color, bool PrintFrames = true) // function for vertical menu
 {
-	gotoXY(x, y);
+	setXY(x, y);
 	WriteColored((PrintFrames != true) ? " " : ">", color);
-	gotoXY(x + len, y);
+	setXY(x + len, y);
 	WriteColored((PrintFrames != true) ? " " : "<", color);
 	ChangeColor(x + 1, y, len, color);
 }
-int VerticalMenu(int x, int y, int len, int puncts)
+int VerticalMenu(int x, int y, int len, int puncts)  // vertical menu 
+//x,y - start position, len - length(width) of menubar, puncts - how manu menu items 
 {
-	int const Highlight = 240, Normal = 7;
+	int const Highlight = 240, Normal = 7; // colors for highlighted and normal menu items
 
 	OneBar(x, y, len, Highlight);
 	int minY = y, maxY = y + puncts - 1;
@@ -420,7 +421,7 @@ void main()
 		WriteCentered("to view the moves", 5, 41);
 		WriteCentered("of some figures", 6, 41);
 
-		gotoXY(58, 8);
+		setXY(58, 8);
 		cout << char(249) << " " << char(249) << " " << char(249);
 
 		WriteCentered("Please select your figure or quit:", 10, 41, 80, 2);
@@ -431,7 +432,7 @@ void main()
 		WriteCentered("Exit", 16, 41);
 
 		WriteCentered("(c) 2016 A.Sh for test aims", 18, 41, 80, 2);
-		gotoXY(58, 20);
+		setXY(58, 20);
 		cout << char(249) << " " << char(249) << " " << char(249);
 
 		Header(42, 22, "    In chess notation:           ", 137);
@@ -522,7 +523,7 @@ void main()
 					break;
 				}
 
-				gotoXY(67, 23);
+				setXY(67, 23);
 				cout << FigureName << " " << char(96 + horizontal) << vertical << "   ";
 				ChangeColor(67, 23, 7, 137);
 			}
